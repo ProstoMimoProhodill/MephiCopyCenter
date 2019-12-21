@@ -21,9 +21,9 @@ $.ajax('session.php',{
             //func in create.js
             if(data){
               if(data=="admin"){
-                admin_create();
+                admin_create(data);
               }else{
-                user_create();
+                user_create(data);
               }
             }else{
               console.log("To login page");

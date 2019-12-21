@@ -1,0 +1,7 @@
+CREATE TABLE `Orders`
+(
+   `id_order` INT NOT NULL AUTO_INCREMENT,
+   `id_user` INT,
+   `created_at` datetime,
+   PRIMARY KEY ( `id_order` )
+);
