@@ -37,6 +37,8 @@ function user_create(d){
     decor += `<option> ` + data['decor'][i]['name'] + " - " + data['decor'][i]['price'] + `руб </option>`;
   }
 
+  let edition = data['edition'];
+
   parent.innerHTML = `<form class="form-signin">
     <label for="format">Формат</label>
     <div class="form-label-group">
@@ -60,7 +62,7 @@ function user_create(d){
     </div>
     <br>
     <div class="form-label-group">
-      <input type="text" id="edition" name="edition" class="form-control" placeholder="edition" required autofocus>
+      <input type="text" id="edition" name="edition" class="form-control" value="1" placeholder="edition" required autofocus>
       <label for="edition">Количество копий</label>
     </div>
     <br>
@@ -79,25 +81,35 @@ function user_create(d){
     <button class="btn btn-lg btn-primary btn-block text-uppercase" id="send" type="submit">Отправить</button>
   </form>`;
 
-  price = data['format'][parseInt(document.getElementById('format').selectedIndex + 1)]['price'];
-  console.log(price);
+  document.getElementsByTagName("html")[0].addEventListener('mouseover', function(){
+    // todo : sale
+    let format = parseInt(data['format'][parseInt(document.getElementById('format').selectedIndex)]['price']);
+    let quality = parseInt(data['quality'][parseInt(document.getElementById('quality').selectedIndex)]['price']);
+    let decor = parseInt(data['decor'][parseInt(document.getElementById('decor').selectedIndex)]['price']);
+    let edition = parseInt(document.getElementById('edition').value);
+    price = (format + quality + decor)*edition;
+    document.getElementById("price").innerHTML = "Итого: " + price;
+  });
 
   document.getElementById('send').addEventListener('click', function(){
     $.ajax({
         url: 'create.php',
         type: "POST",
         data: {
+          'type': 'create_post',
           'id_format': parseInt(document.getElementById('format').selectedIndex + 1),
           'id_quality': parseInt(document.getElementById('quality').selectedIndex + 1),
           'id_decor': parseInt(document.getElementById('decor').selectedIndex + 1),
           'url': document.getElementById('url').value,
+          'price': price,
           'edition': parseInt(document.getElementById('edition').value),
-          'processed': document.getElementById('processed').checked,
-          'consistent_total': document.getElementById('consistent_total').checked
+          'processed': document.getElementById('processed').checked ? 1 : 0,
+          'consistent_total': document.getElementById('consistent_total').checked ? 1 : 0
         },
         success: function(r) {
-          // console.log(r);
-
+          console.log(r);
+          alert("Успешно!");
+          // window.location = "/";
         },
         error: function() {
           console.log("ERROR: AJAX");
