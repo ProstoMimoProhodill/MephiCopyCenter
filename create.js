@@ -1,5 +1,5 @@
 function user_create(d){
-  var btn_create = document.getElementById("btn_create");
+  let btn_create = document.getElementById("btn_create");
   let parent = btn_create.parentNode;
   btn_create.remove();
 
@@ -109,7 +109,7 @@ function user_create(d){
         success: function(r) {
           console.log(r);
           alert("Успешно!");
-          // window.location = "/";
+          window.location = "http://mephicopycenter.ru/";
         },
         error: function() {
           console.log("ERROR: AJAX");
@@ -120,54 +120,92 @@ function user_create(d){
 
 }
 
+
 function admin_create(d) {
-  // console.log("admin");
-  var btn_create = document.getElementById("btn_create");
-  var btn_edit = document.getElementById("btn_edit");
-  var btn_see = document.getElementById("btn_see");
+  user_create(d);
+}
 
+function admin_edit(d) {
+  let btn_create = document.getElementById("btn_create");
+  let btn_edit = document.getElementById("btn_edit");
+  let parent = btn_create.parentNode;
 
-  btn_create.addEventListener('click', function(){
-    $.ajax({
-        url: 'create.php',
-        type: "POST",
-        data: {
-          'type' : 'create',
-        },
-        success: function(data) {
-          console.log(data);
-        },
-        error: function() {
-          console.log("ERROR: AJAX");
-        },
-        async: false
-    });
+  let data = [];
+  $.ajax({
+      url: 'create.php',
+      type: "POST",
+      data: {
+        'type' : 'edit_get_orders',
+      },
+      success: function(d) {
+        data = d;
+      },
+      error: function() {
+        console.log("ERROR: AJAX");
+      },
+      async: false
   });
-  btn_edit.addEventListener('click', function(){
+
+  data = JSON.parse(data);
+  let orders = "";
+  for (let i=0; i<data.length;i++){
+    orders += `<option> ` + data[i]['id_order'] + " - " + data[i]['id_user'] + " - " + data[i]['created_at'] + ` </option>`;
+  }
+
+  parent.innerHTML = `<form class="form-signin">
+    <label for="format">Выберите заказ</label>
+    <div class="form-label-group">
+      <select class="form-control" id="orders">
+      ` + orders + `
+      </select>
+    </div>
+    <br>
+    <button class="btn btn-lg btn-primary btn-block text-uppercase" id="send" type="submit">Выбрать</button>
+  </form>`;
+
+  document.getElementById('send').addEventListener('click', function(){
     $.ajax({
         url: 'create.php',
         type: "POST",
         data: {
-          'type' : 'edit',
+          'type': 'edit_get_orders_data',
+          'id_order': parseInt(document.getElementById('orders').selectedIndex + 1)
         },
-        success: function(data) {
-          console.log(data);
-        },
-        error: function() {
-          console.log("ERROR: AJAX");
-        },
-        async: false
-    });
-  });
-  btn_see.addEventListener('click', function(){
-    $.ajax({
-        url: 'create.php',
-        type: "POST",
-        data: {
-          'type' : 'see',
-        },
-        success: function(data) {
-          console.log(data);
+        success: function(r) {
+          let id_consistent_total_data = parseInt(r);
+          parent.innerHTML = "";
+          parent.innerHTML = `<form class="form-signin">
+            <div class="checkbox">
+              <label><input type="checkbox" value="" id="printed">Отпечатано</label>
+            </div>
+            <div class="checkbox">
+              <label><input type="checkbox" value="" id="decorated">Оформлено</label>
+            </div>
+            <button class="btn btn-lg btn-primary btn-block text-uppercase" id="send_post" type="submit">Отправить</button>
+          </form>`;
+
+          document.getElementById('send_post').addEventListener('click', function(){
+            $.ajax({
+                url: 'create.php',
+                type: "POST",
+                data: {
+                  'type': 'edit_post',
+                  'id_consistent_total_data': id_consistent_total_data,
+                  'printed': document.getElementById('printed').checked ? 1 : 0,
+                  'decorated': document.getElementById('decorated').checked ? 1 : 0
+                },
+                success: function(r) {
+                  console.log(r);
+                  alert("Успешно!");
+                  window.location = "http://mephicopycenter.ru/";
+                },
+                error: function() {
+                  console.log("ERROR: AJAX");
+                },
+                async: false
+            });
+          });
+
         },
         error: function() {
           console.log("ERROR: AJAX");
