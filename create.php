@@ -87,6 +87,27 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
     //push consistent total data
     $sql = "INSERT INTO `ConsistentTotalData`(`id_processed_order`, `refused`) VALUES ('$id_processed_order', '$consistent_total')";
     $result = mysqli_query($db,$sql);
+
+    //get id_consistent_total_data
+    $sql = "SELECT `id_consistent_total_data` FROM `ConsistentTotalData` WHERE `id_processed_order` = '$id_processed_order'";
+    $result = mysqli_query($db,$sql);
+    $row = mysqli_fetch_array($result,MYSQLI_ASSOC);
+    $id_consistent_total_data = $row['id_consistent_total_data'];
+
+    //push printed orders
+    $sql = "INSERT INTO `PrintedOrders`(`id_consistent_total_data`, `done`) VALUES ('$id_consistent_total_data', '0')";
+    $result = mysqli_query($db,$sql);
+
+    //get $id_printed_order
+    $sql = "SELECT `id_printed_order` FROM `ConsistentTotalData` WHERE `id_consistent_total_data` = '$id_consistent_total_data'";
+    $result = mysqli_query($db,$sql);
+    $row = mysqli_fetch_array($result,MYSQLI_ASSOC);
+    $id_printed_order = $row['id_printed_order'];
+
+    //push decored orders
+    $sql = "INSERT INTO `DecoredOrders`(`id_printed_order`, `done`) VALUES ('$id_printed_order', '0')";
+    $result = mysqli_query($db,$sql);
+
   }elseif($type == "edit_get_orders"){
     //orders
     $o = array();
@@ -98,8 +119,17 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 
     echo json_encode($o);
   }elseif($type == "edit_get_orders_data"){
-    //order -> id_consistent_total_data
     $id_order = (int)mysqli_real_escape_string($db,$_POST['id_order']);
+
+    $return = array();
+    $d = array();
+    $sql = "SELECT * FROM `ConsistentData` WHERE `id_order` = '$id_order'";
+    $result = mysqli_query($db,$sql);
+    while ($record = mysqli_fetch_array($result,MYSQLI_ASSOC)) {
+      array_push($d, $record);
+    }
+
+    $return['data'] = $d;
 
     //get id_consistent_data
     $sql = "SELECT `id_consistent_data` FROM `ConsistentData` WHERE `id_order` = '$id_order'";
@@ -108,38 +138,91 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
     $id_consistent_data = $row['id_consistent_data'];
 
     //get id_processed_order
-    $sql = "SELECT `id_processed_order` FROM `ProcessedOrders` WHERE `id_consistent_data` = '$id_consistent_data'";
+    $sql = "SELECT * FROM `ProcessedOrders` WHERE `id_consistent_data` = '$id_consistent_data'";
+    $result = mysqli_query($db,$sql);
+    $row = mysqli_fetch_array($result,MYSQLI_ASSOC);
+    $id_processed_order = $row['id_processed_order'];
+    $return['processed'] = (int)$row['refused'];
+
+    //get id_consistent_total_data
+    $sql = "SELECT * FROM `ConsistentTotalData` WHERE `id_processed_order` = '$id_processed_order'";
+    $result = mysqli_query($db,$sql);
+    $row = mysqli_fetch_array($result,MYSQLI_ASSOC);
+    $id_consistent_total_data = $row['id_consistent_total_data'];
+    $return['consistent_total'] = (int)$row['refused'];
+
+    //get $id_printed_order
+    $sql = "SELECT * FROM `PrintedOrders` WHERE `id_consistent_total_data` = '$id_consistent_total_data'";
+    $result = mysqli_query($db,$sql);
+    $row = mysqli_fetch_array($result,MYSQLI_ASSOC);
+    $id_printed_order = $row['id_printed_order'];
+    $return['printed'] = (int)$row['done'];
+
+    //get $id_decored_order
+    $sql = "SELECT * FROM `DecoredOrders` WHERE `id_printed_order` = '$id_printed_order'";
+    $result = mysqli_query($db,$sql);
+    $row = mysqli_fetch_array($result,MYSQLI_ASSOC);
+    $id_decored_order = $row['id_decored_order'];
+    $return['decored'] = (int)$row['done'];
+
+    echo json_encode($return);
+  }elseif($type == "edit_post"){
+    $id_order = (int)mysqli_real_escape_string($db,$_POST['id_order']);
+    $id_format = (int)mysqli_real_escape_string($db,$_POST['id_format']);
+    $id_quality = (int)mysqli_real_escape_string($db,$_POST['id_quality']);
+    $id_decor = (int)mysqli_real_escape_string($db,$_POST['id_decor']);
+    $url = mysqli_real_escape_string($db,$_POST['url']);
+    $price = (int)mysqli_real_escape_string($db,$_POST['price']);
+    $edition = (int)mysqli_real_escape_string($db,$_POST['edition']);
+    $processed = (int)mysqli_real_escape_string($db,$_POST['processed']);
+    $consistent_total = (int)mysqli_real_escape_string($db,$_POST['consistent_total']);
+    $printed = (int)mysqli_real_escape_string($db,$_POST['printed']);
+    $decored = (int)mysqli_real_escape_string($db,$_POST['decored']);
+
+    //update ConsistentData
+    $sql = "UPDATE `ConsistentData` SET `id_format` = '$id_format', `id_quality` = '$id_quality', `id_decor` = '$id_decor', `edition` = '$edition', `price` = '$price', `url` = '$url' WHERE `id_order` = '$id_order'";
+    $result = mysqli_query($db,$sql);
+
+    //get id_consistent_data
+    $sql = "SELECT `id_consistent_data` FROM `ConsistentData` WHERE `id_order` = '$id_order'";
+    $result = mysqli_query($db,$sql);
+    $row = mysqli_fetch_array($result,MYSQLI_ASSOC);
+    $id_consistent_data = $row['id_consistent_data'];
+
+    //update ProcessedOrders
+    $sql = "UPDATE `ProcessedOrders` SET `refuse` = '$processed' WHERE `id_consistent_data` = '$id_consistent_data'";
+    $result = mysqli_query($db,$sql);
+
+    //get id_processed_order
+    $sql = "SELECT * FROM `ProcessedOrders` WHERE `id_consistent_data` = '$id_consistent_data'";
     $result = mysqli_query($db,$sql);
     $row = mysqli_fetch_array($result,MYSQLI_ASSOC);
     $id_processed_order = $row['id_processed_order'];
 
-    //get id_processed_order
-    $sql = "SELECT `id_consistent_total_data` FROM `ConsistentTotalData` WHERE `id_processed_order` = '$id_processed_order'";
+    //update ConsistentTotalData
+    $sql = "UPDATE `ConsistentTotalData` SET `refuse` = '$consistent_total' WHERE `id_processed_order` = '$id_processed_order'";
+    $result = mysqli_query($db,$sql);
+
+    //get id_consistent_total_data
+    $sql = "SELECT * FROM `ConsistentTotalData` WHERE `id_processed_order` = '$id_processed_order'";
     $result = mysqli_query($db,$sql);
     $row = mysqli_fetch_array($result,MYSQLI_ASSOC);
     $id_consistent_total_data = $row['id_consistent_total_data'];
 
-    echo "" . $id_consistent_total_data;
-  }elseif($type == "edit_post"){
-    $id_consistent_total_data = (int)mysqli_real_escape_string($db,$_POST['id_consistent_total_data']);
-    $printed = (int)mysqli_real_escape_string($db,$_POST['printed']);
-    $decorated = (int)mysqli_real_escape_string($db,$_POST['decorated']);
-
-    //push printed orders
-    $sql = "INSERT INTO `PrintedOrders`(`id_consistent_total_data`, `done`) VALUES ('$id_consistent_total_data', '$printed')";
+    //update PrintedOrders
+    $sql = "UPDATE `PrintedOrders` SET `done` = '$printed' WHERE `id_consistent_total_data` = '$id_consistent_total_data'";
     $result = mysqli_query($db,$sql);
 
-    //get id_printed_order
-    $sql = "SELECT `id_printed_order` FROM `PrintedOrders` WHERE `id_consistent_total_data` = '$id_consistent_total_data'";
+    //get $id_printed_order
+    $sql = "SELECT * FROM `PrintedOrders` WHERE `id_consistent_total_data` = '$id_consistent_total_data'";
     $result = mysqli_query($db,$sql);
     $row = mysqli_fetch_array($result,MYSQLI_ASSOC);
     $id_printed_order = $row['id_printed_order'];
 
-    //push decorated orders
-    $sql = "INSERT INTO `DecoredOrders`(`id_printed_order`, `done`) VALUES ('$id_printed_order', '$decorated')";
+    //update DecoredOrders
+    $sql = "UPDATE `DecoredOrders` SET `done` = '$decored' WHERE `id_printed_order` = '$id_printed_order'";
     $result = mysqli_query($db,$sql);
   }
-
 }
 
 ?>
