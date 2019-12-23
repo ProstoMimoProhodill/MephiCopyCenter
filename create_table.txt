@@ -1,3 +1,14 @@
+CREATE TABLE `users`
+(
+   `id_user` INT NOT NULL AUTO_INCREMENT,
+   `username` TEXT,
+   `password` TEXT,
+   `email` TEXT,
+   `created_at` datetime,
+   `last_time` datetime,
+   PRIMARY KEY ( `id_user` )
+);
+
 CREATE TABLE `Orders`
 (
    `id_order` INT NOT NULL AUTO_INCREMENT,
@@ -5,3 +16,81 @@ CREATE TABLE `Orders`
    `created_at` datetime,
    PRIMARY KEY ( `id_order` )
 );
+
+CREATE TABLE `ConsistentData`
+(
+   `id_consistent_data` INT NOT NULL AUTO_INCREMENT,
+   `id_order` INT,
+   `id_format` INT,
+   `id_quality` INT,
+   `id_decor` INT,
+   `url` TEXT,
+   `edition` INT,
+   `price` INT,
+   PRIMARY KEY ( `id_consistent_data` )
+);
+
+CREATE TABLE `ProcessedOrders`
+(
+   `id_processed_order` INT NOT NULL AUTO_INCREMENT,
+   `id_consistent_data` INT,
+   `refused` BOOLEAN,
+   PRIMARY KEY ( `id_processed_order` )
+);
+
+CREATE TABLE `ConsistentTotalData`
+(
+   `id_consistent_total_data` INT NOT NULL AUTO_INCREMENT,
+   `id_processed_order` INT,
+   `refused` BOOLEAN,
+   PRIMARY KEY ( `id_consistent_total_data` )
+);
+
+CREATE TABLE `PrintedOrders`
+(
+   `id_printed_order` INT NOT NULL AUTO_INCREMENT,
+   `id_consistent_total_data` INT,
+   `done` BOOLEAN,
+   PRIMARY KEY ( `id_printed_order` )
+);
+
+CREATE TABLE `DecoredOrders`
+(
+   `id_decored_order` INT NOT NULL AUTO_INCREMENT,
+   `id_printed_order` INT,
+   `done` BOOLEAN,
+   PRIMARY KEY ( `id_decored_order` )
+);
+
+CREATE TABLE `Edition`
+(
+   `range` TEXT,
+   `sale` FLOAT
+);
+
+INSERT INTO `users`(`username`, `password`, `email`, `created_at`, `last_time`) VALUES ('admin', 'zx', 'email', now(), now());
+INSERT INTO `users`(`username`, `password`, `email`, `created_at`, `last_time`) VALUES ('user', 'zx', 'email', now(), now());
+
+INSERT INTO `Format`(`name`, `price`) VALUES ('A0', 960);
+INSERT INTO `Format`(`name`, `price`) VALUES ('A1', 500);
+INSERT INTO `Format`(`name`, `price`) VALUES ('A2', 450);
+INSERT INTO `Format`(`name`, `price`) VALUES ('A3', 400);
+INSERT INTO `Format`(`name`, `price`) VALUES ('A4', 200);
+INSERT INTO `Format`(`name`, `price`) VALUES ('A5', 100);
+
+INSERT INTO `Quality`(`name`, `price`) VALUES ('бумага 80 г/м ("обычная")', 20);
+INSERT INTO `Quality`(`name`, `price`) VALUES ('бумага с покрытием матовая 105 г/м2', 25);
+INSERT INTO `Quality`(`name`, `price`) VALUES ('бумага с покрытием матовая 130 г/м2', 30);
+INSERT INTO `Quality`(`name`, `price`) VALUES ('бумага с покрытием матовая 170 г/м2', 40);
+INSERT INTO `Quality`(`name`, `price`) VALUES ('бумага с покрытием матовая 200 г/м2', 50);
+INSERT INTO `Quality`(`name`, `price`) VALUES ('бумага DNS Premium 300 г/м2', 100);
+
+INSERT INTO `Decor`(`name`, `price`) VALUES ('Переплёт без тиснения', 100);
+INSERT INTO `Decor`(`name`, `price`) VALUES ('Переплет со стандартным тиснением', 200);
+INSERT INTO `Decor`(`name`, `price`) VALUES ('Добавление файла, 1 шт', 250);
+INSERT INTO `Decor`(`name`, `price`) VALUES ('Вставить в рамку', 400);
+INSERT INTO `Decor`(`name`, `price`) VALUES ('Не нужно', 0);
+
+INSERT INTO `Edition`(`range`, `sale`) VALUES ('21-100', 0.6);
+INSERT INTO `Edition`(`range`, `sale`) VALUES ('11-20', 0.9);
+INSERT INTO `Edition`(`range`, `sale`) VALUES ('1-10', 1);
