@@ -2,13 +2,15 @@ let host = "192.168.1.51";
 
 let delay = 1200000;
 let timerId = setInterval(function request() {
-  let question = confirm("Бездействие! (OK - продолжить, Cancel - выйти)");
-  if(!question){
-    window.location = "/logout.php";
-    console.log("Выход");
-  }else{
-    console.log("Остаемся");
-  }
+  // let question = confirm("Бездействие! (OK - продолжить, Cancel - выйти)");
+  // if(!question){
+  //   window.location = "/logout.php";
+  //   console.log("Выход");
+  // }else{
+  //   console.log("Остаемся");
+  // }
+  window.location = "/logout.php";
+  console.log("Выход");
 }, delay);
 
 $.ajax('session.php',{

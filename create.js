@@ -14,7 +14,6 @@ function user_create(d){
           'type' : 'create_get',
         },
         success: function(r) {
-          // console.log(r);
           data = r;
         },
         error: function() {
@@ -161,6 +160,7 @@ function admin_edit_order(d, id_order){
   });
 
   data = JSON.parse(data);
+
   let format = "";
   for (let i=0; i<data['format'].length;i++){
     format += `<option> ` + data['format'][i]['name'] + " - " + data['format'][i]['price'] + `руб </option>`;
@@ -202,7 +202,7 @@ function admin_edit_order(d, id_order){
     </div>
     <br>
     <div class="form-label-group">
-      <input type="text" id="edition" name="edition" class="form-control" value="1" placeholder="edition" required autofocus>
+      <input type="text" id="edition" name="edition" class="form-control" value="1" placeholder="edition" required autofocus disabled>
       <label for="edition">Количество копий</label>
     </div>
     <br>
@@ -327,15 +327,16 @@ function admin_edit(d) {
   </form>`;
 
   document.getElementById('send').addEventListener('click', function(){
+    let id_order = data[parseInt(document.getElementById('orders').selectedIndex)]['id_order'];
     $.ajax({
         url: 'create.php',
         type: "POST",
         data: {
           'type': 'edit_get_orders_data',
-          'id_order': parseInt(document.getElementById('orders').selectedIndex + 1)
+          'id_order': id_order
         },
         success: function(r) {
-          admin_edit_order(r, parseInt(document.getElementById('orders').selectedIndex + 1));
+          admin_edit_order(r, id_order);
         },
         error: function() {
           console.log("ERROR: AJAX");
