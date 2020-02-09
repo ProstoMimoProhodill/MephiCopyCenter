@@ -1,3 +1,5 @@
+let LOCK = 1;
+
 function user_create(d){
   let btn_create = document.getElementById("btn_create");
   let parent = btn_create.parentNode;
@@ -38,6 +40,7 @@ function user_create(d){
   }
 
   let edition = data['edition'];
+  let balance = data['balance'][0]['balance'];
 
   parent.innerHTML = `<form class="form-signin">
     <label for="format">Формат</label>
@@ -63,7 +66,7 @@ function user_create(d){
     <br>
     <div class="form-label-group">
       <input type="text" id="edition" name="edition" class="form-control" value="1" placeholder="edition" required autofocus>
-      <label for="edition">Количество копий</label>
+      <label for="edition">Количество копий (Доступно - ` + balance + ` штук)</label>
     </div>
     <br>
     <div class="form-label-group">
@@ -92,32 +95,41 @@ function user_create(d){
   });
 
   document.getElementById('send').addEventListener('click', function(){
-    $.ajax({
-        url: 'create.php',
-        type: "POST",
-        data: {
-          'type': 'create_post',
-          'id_format': parseInt(document.getElementById('format').selectedIndex + 1),
-          'id_quality': parseInt(document.getElementById('quality').selectedIndex + 1),
-          'id_decor': parseInt(document.getElementById('decor').selectedIndex + 1),
-          'url': document.getElementById('url').value,
-          'price': price,
-          'edition': parseInt(document.getElementById('edition').value),
-          'processed': document.getElementById('processed').checked ? 1 : 0,
-          'consistent_total': document.getElementById('consistent_total').checked ? 1 : 0
-        },
-        success: function(r) {
-          console.log(r);
-          alert("Успешно!");
-          window.location = "http://mephicopycenter.ru/";
-        },
-        error: function() {
-          console.log("ERROR: AJAX");
-        },
-        async: false
-    });
+    if(parseInt(document.getElementById('edition').value) <= balance && balance != 0){
+      $.ajax({
+          url: 'create.php',
+          type: "POST",
+          data: {
+            'lock': LOCK,
+            'type': 'create_post',
+            'id_format': parseInt(document.getElementById('format').selectedIndex + 1),
+            'id_quality': parseInt(document.getElementById('quality').selectedIndex + 1),
+            'id_decor': parseInt(document.getElementById('decor').selectedIndex + 1),
+            'url': document.getElementById('url').value,
+            'price': price,
+            'edition': parseInt(document.getElementById('edition').value),
+            'processed': document.getElementById('processed').checked ? 1 : 0,
+            'consistent_total': document.getElementById('consistent_total').checked ? 1 : 0
+          },
+          success: function(r) {
+            console.log(r);
+            if(r == "error"){
+              alert("Ошибка");
+            }else{
+              alert("Успешно!");
+            }
+            window.location = "/";
+          },
+          error: function() {
+            console.log("ERROR: AJAX");
+          },
+          async: false
+      });
+    }else{
+      alert("Не допустимое количество! Попробуйте заново")
+      window.location = "/";
+    }
   });
-
 }
 
 
@@ -246,6 +258,7 @@ function admin_edit_order(d, id_order){
         type: "POST",
         data: {
           'type': 'edit_post',
+          'lock': LOCK,
           'id_order': id_order,
           'id_format': parseInt(document.getElementById('format').selectedIndex + 1),
           'id_quality': parseInt(document.getElementById('quality').selectedIndex + 1),
@@ -260,8 +273,12 @@ function admin_edit_order(d, id_order){
         },
         success: function(r) {
           console.log(r);
-          alert("Успешно!");
-          window.location = "http://mephicopycenter.ru/";
+          if(r == "error"){
+            alert("Ошибка!");
+          }else{
+            alert("Успешно!");
+          }
+          window.location = "/";
         },
         error: function() {
           console.log("ERROR: AJAX");

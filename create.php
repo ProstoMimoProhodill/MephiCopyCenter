@@ -38,13 +38,41 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
       array_push($e, $record);
     }
 
+    //balance
+    $b = array();
+    $sql = "SELECT MIN(`balance`) as `balance` FROM `Balance`";
+    $result = mysqli_query($db,$sql);
+    while ($record = mysqli_fetch_array($result,MYSQLI_ASSOC)) {
+      array_push($b, $record);
+    }
+
     $return['format'] = $f;
     $return['quality'] = $q;
     $return['decor'] = $d;
     $return['edition'] = $e;
+    $return['balance'] = $b;
     echo json_encode($return);
 
   }elseif($type == "create_post"){
+    $lock = (int)mysqli_real_escape_string($db,$_POST['lock']);
+    if($lock == 1){
+      $sql = "LOCK TABLES `Orders` WRITE, `ConsistentData` WRITE, `ConsistentTotalData` WRITE, `ProcessedOrders` WRITE, `PrintedOrders` WRITE, `DecoredOrders` WRITE, `Balance` WRITE";
+      $result = mysqli_query($db,$sql);
+    }
+
+    //get Balance
+    $sql = "SELECT MIN(`balance`) as `balance` FROM `Balance`";
+    $result = mysqli_query($db,$sql);
+    $row = mysqli_fetch_array($result,MYSQLI_ASSOC);
+    $balance = $row['balance'];
+
+    if($balance == 0){
+      echo "error";
+      exit();
+    }
+
+    sleep(3);
+
     $id_format = (int)mysqli_real_escape_string($db,$_POST['id_format']);
     $id_quality = (int)mysqli_real_escape_string($db,$_POST['id_quality']);
     $id_decor = (int)mysqli_real_escape_string($db,$_POST['id_decor']);
@@ -108,6 +136,15 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
     $sql = "INSERT INTO `DecoredOrders`(`id_printed_order`, `done`) VALUES ('$id_printed_order', '0')";
     $result = mysqli_query($db,$sql);
 
+    //push balance
+    $balance = $balance - $edition;
+    $sql = "INSERT INTO `Balance`(`balance`, `time`) VALUES ('$balance', NOW())";
+    $result = mysqli_query($db,$sql);
+
+    if($lock == 1){
+      $sql = "UNLOCK TABLES";
+      $result = mysqli_query($db,$sql);
+    }
   }elseif($type == "edit_get_orders"){
     //orders
     $o = array();
@@ -167,6 +204,15 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 
     echo json_encode($return);
   }elseif($type == "edit_post"){
+    $lock = (int)mysqli_real_escape_string($db,$_POST['lock']);
+    if($lock == 1){
+      $sql = "LOCK TABLES `Orders` WRITE, `ConsistentData` WRITE, `ConsistentTotalData` WRITE, `ProcessedOrders` WRITE, `PrintedOrders` WRITE, `DecoredOrders` WRITE, `Balance` WRITE";
+      $result = mysqli_query($db,$sql);
+    }else{
+      echo "error";
+      exit();
+    }
+
     $id_order = (int)mysqli_real_escape_string($db,$_POST['id_order']);
     $id_format = (int)mysqli_real_escape_string($db,$_POST['id_format']);
     $id_quality = (int)mysqli_real_escape_string($db,$_POST['id_quality']);

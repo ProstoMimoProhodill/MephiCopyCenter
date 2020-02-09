@@ -1,14 +1,20 @@
+let host = "192.168.1.51";
+
 let delay = 1200000;
-let timerId = setTimeout(function request() {
-  if(!confirm("Бездействие")){
+let timerId = setInterval(function request() {
+  let question = confirm("Бездействие! (OK - продолжить, Cancel - выйти)");
+  if(!question){
     window.location = "/logout.php";
+    console.log("Выход");
+  }else{
+    console.log("Остаемся");
   }
 }, delay);
 
 $.ajax('session.php',{
     success: function(data) {
       window.addEventListener('load',function(){
-        if(window.location == "http://mephicopycenter.ru/"){
+        if(window.location.host == host){
           if(data=="admin"){
             let parent = document.getElementById("btn_create").parentNode;
             parent.innerHTML += `<button class="btn btn-primary center-block align-middle" id="btn_edit" style="margin-top: 15px">Редактировать заказ</button>`;
