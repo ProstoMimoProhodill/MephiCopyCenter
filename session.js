@@ -1,6 +1,8 @@
 let host = "192.168.1.51";
 
 let delay = 1200000;
+// let delay = 5000;
+
 let timerId = setInterval(function request() {
   // let question = confirm("Бездействие! (OK - продолжить, Cancel - выйти)");
   // if(!question){

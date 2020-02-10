@@ -11,6 +11,14 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 
   if($username != "admin"){
     if($password == $confirm_password){
+      $sql = "SELECT `id_user` FROM `users` WHERE username = '$username'";
+      $result = mysqli_query($db,$sql);
+      $count = mysqli_num_rows($result);
+      if($count == 1){
+        echo "<script type='text/javascript'>alert('Уже существует!'); window.location = '/register.html'</script>";
+        exit();
+      }
+
       $sql = "INSERT INTO `users`(`username`, `password`, `email`) VALUES ('$username', '$password', '$email')";
       $result = mysqli_query($db,$sql);
 
