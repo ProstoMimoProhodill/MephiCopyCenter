@@ -345,3 +345,35 @@ function admin_edit(d) {
     });
   });
 }
+
+function admin_add_balance(){
+  let btn_create = document.getElementById("btn_create");
+  let btn_edit = document.getElementById("btn_edit");
+  let parent = btn_create.parentNode;
+
+  parent.innerHTML = `<form class="form-signin">
+    <div class="form-label-group">
+      <input type="text" id="balance" name="edition" class="form-control" value="1" placeholder="edition" >
+      <label for="edition">Введите новый баланс</label>
+    </div>
+    <button class="btn btn-lg btn-primary btn-block text-uppercase" id="save" type="submit">Сохранить</button>
+  </form>`;
+
+  document.getElementById('save').addEventListener('click', function(){
+    $.ajax({
+        url: 'create.php',
+        type: "POST",
+        data: {
+          'type': 'edit_balance',
+          'balance': parseInt(document.getElementById('balance').value)
+        },
+        success: function(r) {
+          window.location = "/";
+        },
+        error: function() {
+          console.log("ERROR: AJAX");
+        },
+        async: false
+    });
+  });
+}

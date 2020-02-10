@@ -20,11 +20,15 @@ $.ajax('session.php',{
           if(data=="admin"){
             let parent = document.getElementById("btn_create").parentNode;
             parent.innerHTML += `<button class="btn btn-primary center-block align-middle" id="btn_edit" style="margin-top: 15px">Редактировать заказ</button>`;
+            parent.innerHTML += `<button class="btn btn-primary center-block align-middle" id="btn_add_balance" style="margin-top: 15px">Пополнить баланс заказов</button>`;
             document.getElementById("btn_create").addEventListener('click', function(){
               admin_create(data);
             });
             document.getElementById("btn_edit").addEventListener('click', function(){
               admin_edit(data);
+            });
+            document.getElementById("btn_add_balance").addEventListener('click', function(){
+              admin_add_balance(data);
             });
           }else if(data){
             document.getElementById("btn_create").addEventListener('click', function(){
