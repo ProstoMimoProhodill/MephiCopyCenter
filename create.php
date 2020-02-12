@@ -127,7 +127,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
     $result = mysqli_query($db,$sql);
 
     //get $id_printed_order
-    $sql = "SELECT `id_printed_order` FROM `ConsistentTotalData` WHERE `id_consistent_total_data` = '$id_consistent_total_data'";
+    $sql = "SELECT `id_printed_order` FROM `PrintedOrders` WHERE `id_consistent_total_data` = '$id_consistent_total_data'";
     $result = mysqli_query($db,$sql);
     $row = mysqli_fetch_array($result,MYSQLI_ASSOC);
     $id_printed_order = $row['id_printed_order'];
@@ -268,6 +268,11 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
     //update DecoredOrders
     $sql = "UPDATE `DecoredOrders` SET `done` = '$decored' WHERE `id_printed_order` = '$id_printed_order'";
     $result = mysqli_query($db,$sql);
+
+    if($lock == 1){
+      $sql = "UNLOCK TABLES";
+      $result = mysqli_query($db,$sql);
+    }
   }elseif($type == "edit_balance"){
     //clear table
     $sql = "TRUNCATE TABLE `Balance`";

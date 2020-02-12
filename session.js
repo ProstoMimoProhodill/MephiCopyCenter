@@ -19,10 +19,29 @@ $.ajax('session.php',{
     success: function(data) {
       window.addEventListener('load',function(){
         if(window.location.host == host){
+
+          //set cookie for 5 minutes
+          if(data != ""){
+            console.log("user=" + data + "; max-age=300");
+            document.cookie = "user=" + data + "; max-age=300";
+          }
+
+          if(window.location.pathname == "/login.html"){
+            function getCookie(name) {
+              let matches = document.cookie.match(new RegExp(
+                "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+              ));
+              return matches ? decodeURIComponent(matches[1]) : undefined;
+            }
+            document.getElementById('username').value = getCookie('user');
+          }
+
+          //routing
           if(data=="admin"){
             let parent = document.getElementById("btn_create").parentNode;
             parent.innerHTML += `<button class="btn btn-primary center-block align-middle" id="btn_edit" style="margin-top: 15px">Редактировать заказ</button>`;
             parent.innerHTML += `<button class="btn btn-primary center-block align-middle" id="btn_add_balance" style="margin-top: 15px">Пополнить баланс заказов</button>`;
+            // parent.innerHTML += `<div class="checkbox"><label><input type="checkbox" value="" id="processed">Блокировка</label></div>`;
             document.getElementById("btn_create").addEventListener('click', function(){
               admin_create(data);
             });
@@ -37,9 +56,11 @@ $.ajax('session.php',{
               user_create(data);
             });
           }else{
-            document.getElementById("btn_create").addEventListener('click', function(){
-              window.location = "/login.html";
-            });
+            if(window.location.pathname != "/login.html"){
+              document.getElementById("btn_create").addEventListener('click', function(){
+                window.location = "/login.html";
+              });
+            }
           }
         }
       });
