@@ -223,6 +223,9 @@ function admin_edit_order(d, id_order){
     <div class="checkbox">
       <label><input type="checkbox" value="" id="decored">Оформлено</label>
     </div>
+    <div class="checkbox">
+      <label><input type="checkbox" value="" id="canceled">Отменён</label>
+    </div>
     <label id="price">Итого: </label>
     <button class="btn btn-lg btn-primary btn-block text-uppercase" id="save" type="submit">Сохранить</button>
   </form>`;
@@ -239,6 +242,7 @@ function admin_edit_order(d, id_order){
   document.getElementById("consistent_total").checked = parseInt(order['consistent_total']);
   document.getElementById("printed").checked = parseInt(order['printed']);
   document.getElementById("decored").checked = parseInt(order['decored']);
+  document.getElementById("canceled").checked = parseInt(order['data'][0]['canceled']);
 
   //calculate new price
   document.getElementsByTagName("html")[0].addEventListener('mouseover', function(){
@@ -269,7 +273,8 @@ function admin_edit_order(d, id_order){
           'processed': document.getElementById('processed').checked ? 1 : 0,
           'consistent_total': document.getElementById('consistent_total').checked ? 1 : 0,
           'printed': document.getElementById('printed').checked ? 1 : 0,
-          'decored': document.getElementById('decored').checked ? 1 : 0
+          'decored': document.getElementById('decored').checked ? 1 : 0,
+          'canceled': document.getElementById('canceled').checked ? 1 : 0
         },
         success: function(r) {
           console.log(r);

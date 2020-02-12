@@ -1,4 +1,5 @@
-let host = "192.168.1.51";
+// let host = "192.168.1.51";
+let host = "localhost";
 
 let delay = 1200000;
 // let delay = 5000;
@@ -33,7 +34,10 @@ $.ajax('session.php',{
               ));
               return matches ? decodeURIComponent(matches[1]) : undefined;
             }
-            document.getElementById('username').value = getCookie('user');
+            let res = getCookie('user');
+            if(res!=undefined){
+              document.getElementById('username').value = res;
+            }
           }
 
           //routing

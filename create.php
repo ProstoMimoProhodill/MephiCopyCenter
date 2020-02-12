@@ -224,9 +224,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
     $consistent_total = (int)mysqli_real_escape_string($db,$_POST['consistent_total']);
     $printed = (int)mysqli_real_escape_string($db,$_POST['printed']);
     $decored = (int)mysqli_real_escape_string($db,$_POST['decored']);
+    $canceled = (int)mysqli_real_escape_string($db,$_POST['canceled']);
 
     //update ConsistentData
-    $sql = "UPDATE `ConsistentData` SET `id_format` = '$id_format', `id_quality` = '$id_quality', `id_decor` = '$id_decor', `edition` = '$edition', `price` = '$price', `url` = '$url' WHERE `id_order` = '$id_order'";
+    $sql = "UPDATE `ConsistentData` SET `id_format` = '$id_format', `id_quality` = '$id_quality', `id_decor` = '$id_decor', `edition` = '$edition', `price` = '$price', `canceled` = '$canceled',`url` = '$url' WHERE `id_order` = '$id_order'";
     $result = mysqli_query($db,$sql);
 
     //get id_consistent_data
